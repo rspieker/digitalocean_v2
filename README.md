@@ -12,12 +12,12 @@ All of the (current) Digital Ocean API main interfaces are represented by an obj
 
 ###Method signature
 All methods follow the same simple convention; the last argument is always the callback function. The majority of methods does not require any other arguments. If no callback was provided an error is thrown:
-```
+```javascript
 //  invoking the droplet.rename method without callback
 Error: No callback function provided for rename method
 ```
 If any argument is required and a callback function is provided, the callback will be invoke with the error argument populated with an object indicating what is missing.
-```json
+```javascript
 //  invoking the droplet.rename method without name
 { id: 'error_name', message: 'Missing argument(s): "name" for rename method' }
 ```
@@ -31,7 +31,7 @@ Our callback signature follows the same syntax commonly used for nodejs async fu
 
 
 ###CamelCase
-Our eyes bleed when using an Object Oriented notation which uses underscores in method names, hence we provide a lowerCamelCased API in our implementation, both in execution and response, but never in response values.
+Our eyes bleed when using an Object Oriented notation which has underscores in method names, hence we provide a lowerCamelCased API in our implementation, both in execution and response keys, but never in response values.
 
 
 ###Limits
@@ -44,7 +44,7 @@ The Digital Ocean devs have implemented a very sane default of 25 items per page
 
 ##Token
 You first need to create a token for your account, this token is then provided to the library.
-I am inclined to provide a proper example which asks for your API token and then stores it in localStorage, of course you could hardcode your token (and push it onto your production website for the world to play with your instances), but I *strongly urge you not to*.
+I am inclined to provide a proper example which asks for your API token and then stores it in localStorage, of course you could hardcode your token (and push it onto your production website for the world to play with your instances), but I *strongly urge you not to* (if you insist on doing this, please make sure to give me the link too).
 
 ```javascript
 //  see of we can obtain the token from localStorage
@@ -127,7 +127,8 @@ Output will be similar to:
 	...
 ]
 ```
-#####id method
+
+#####`id` method
 Actions can also be retrieved individually by their id's
 ```javascript
 DOv2.Actions.id(12345678, function(error, result){
@@ -151,6 +152,192 @@ Output will be similar to:
 	resourceId: 1234567,
 	resourceType: "droplet",
 	region: "nyc1"
+}
+```
+
+####Droplets
+With the Droplets API you can inspect and control your droplets.
+```javascript
+DOv2.Droplets.list(function(error, result, next){
+	if (error)
+		throw new Error(error);
+
+	//  result is an Array containing one Object per droplet
+	console.log(result);
+
+	if (next)
+		console.log('And there is more...');
+
+});
+```
+Output will be similar to:
+```json
+[
+	{
+		actionsIds: [
+			1234, 2345, ..., 3456
+		],
+		actions: <function>,
+		backupId: [
+			4567, 5678, ..., 6789
+		],
+		backups: <function>,
+		changeKernel: <function>,
+		destroy: <function>,
+		disableBackups: <function>,
+		enableIPv6: <function>,
+		enablePrivateNetworking: <function>,
+		id: 7890,
+		kernel: {
+			id: 8901,
+			name: "Ubuntu 14.04 x64 vmlinuz-3.13.0-24-generic (1221)",
+			version: "3.13.0-24-generic"
+		},
+		kernels: <function>,
+		locked: false,
+		name: "My Awesome Droplet",
+		networks: {
+			v4: [
+				{
+					gateway: 'x.x.x.x',
+					ipAddress: 'y.y.y.y',
+					netmask: 'z.z.z.z',
+					type: 'private'
+				},
+				...
+			],
+			v6: []  //  (only in Singapore atm)
+		},
+		passwordReset: <function>,
+		powerCycle: <function>,
+		powerOff: <function>,
+		powerOn: <function>,
+		reboot: <function>,
+		rebuild: <function>,
+		region: {
+			available: true,
+			features: [
+				'virtio', 'private_networking', 'backups'
+			],
+			name: 'New York 1',
+			sizes: [
+				'512mb', '1gb', ..., '64gb'
+			],
+			slug: 'nyc1',
+		},
+		rename: <function>,
+		resize: <function>,
+		restore: <function>,
+		shutdown: <function>,
+		size: {
+			disk: 20,
+			memory: 512,
+			priceHourly: '0.00744',
+			priceMonthly: '5.0',
+			regions: [
+				'nyc1', 'sgp1', ..., 'nyc2'
+			],
+			slug: '512mb',
+			transfer: 1000,
+			vcpus: 1
+		},
+		snapshopIds: [
+			9012, 9876, ..., 8765
+		],
+		snapshots: <function>,
+		status: 'off'
+	}
+]
+```
+You may have noticed how there are several member indicated as function on the items in the result array, these are the droplet instance actions, on which more in a bit.
+#####`id` method
+In order to obtain a specific droplet by its id, you can use the `id` method
+```javascript
+DOv2.Droplets.id(7890, function(error, result){
+	if (error)
+		throw new Error(error);
+
+	//  result is a single Object
+	console.log(result);
+
+	//  no next, there can be only one...
+});
+```
+The output will be similar to
+```json
+{
+	actionsIds: [
+		1234, 2345, ..., 3456
+	],
+	actions: <function>,
+	backupId: [
+		4567, 5678, ..., 6789
+	],
+	backups: <function>,
+	changeKernel: <function>,
+	destroy: <function>,
+	disableBackups: <function>,
+	enableIPv6: <function>,
+	enablePrivateNetworking: <function>,
+	id: 7890,
+	kernel: {
+		id: 8901,
+		name: "Ubuntu 14.04 x64 vmlinuz-3.13.0-24-generic (1221)",
+		version: "3.13.0-24-generic"
+	},
+	kernels: <function>,
+	locked: false,
+	name: "My Awesome Droplet",
+	networks: {
+		v4: [
+			{
+				gateway: 'x.x.x.x',
+				ipAddress: 'y.y.y.y',
+				netmask: 'z.z.z.z',
+				type: 'private'
+			},
+			...
+		],
+		v6: []  //  (only in Singapore atm)
+	},
+	passwordReset: <function>,
+	powerCycle: <function>,
+	powerOff: <function>,
+	powerOn: <function>,
+	reboot: <function>,
+	rebuild: <function>,
+	region: {
+		available: true,
+		features: [
+			'virtio', 'private_networking', 'backups'
+		],
+		name: 'New York 1',
+		sizes: [
+			'512mb', '1gb', ..., '64gb'
+		],
+		slug: 'nyc1',
+	},
+	rename: <function>,
+	resize: <function>,
+	restore: <function>,
+	shutdown: <function>,
+	size: {
+		disk: 20,
+		memory: 512,
+		priceHourly: '0.00744',
+		priceMonthly: '5.0',
+		regions: [
+			'nyc1', 'sgp1', ..., 'nyc2'
+		],
+		slug: '512mb',
+		transfer: 1000,
+		vcpus: 1
+	},
+	snapshopIds: [
+		9012, 9876, ..., 8765
+	],
+	snapshots: <function>,
+	status: 'off'
 }
 ```
 
