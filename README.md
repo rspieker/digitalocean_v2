@@ -94,15 +94,15 @@ kx.ready(function(){
 ```
 
 ###API
-[x] [Actions]{#Actions)
-	- [x] [list](#Actions)
-	- [x] [id](#Actions.id)
-[ ] Domains
-[x] Droplets
-[x] Images
-[ ] Keys
-[x] Regions
-[x] Size
+- [x] [Actions]{#Actions)
+	- [x] [list](#actions)
+	- [x] [id](#actions.id-method)
+- [ ] Domains
+- [x] Droplets
+- [x] Images
+- [ ] Keys
+- [x] Regions
+- [x] Size
 
 
 ###Usage
