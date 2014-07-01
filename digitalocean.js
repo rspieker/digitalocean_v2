@@ -116,14 +116,15 @@
 					error = [],
 					p;
 
-				for (p in settings.param)
-					if (settings.param[p] === '#')  //  parameter required
-					{
-						if (arg.length)
-							param[p] = arg.shift();
-						else
-							error.push(p);
-					}
+				if ('param' in settings)
+					for (p in settings.param)
+						if (settings.param[p] === '#')  //  parameter required
+						{
+							if (arg.length)
+								param[p] = arg.shift();
+							else
+								error.push(p);
+						}
 
 				//  if there is no callback, we create one which provides feedback about it once it returns
 				if (!callback)
@@ -142,6 +143,8 @@
 				return ready(param, callback);
 			});
 		};
+
+		return decorator;
 	}
 
 
@@ -232,30 +235,32 @@
 		 */
 		function process(noun, result, callback, decoration)
 		{
-			var next = null,
+			var key = noun,
+				next = null,
 				list = [],
 				i;
 
-			if (!(noun in result))
+			if (!(key in result))
 			{
 				//  API calls which return a single item by default don't use the plural form of the noun
-				if (noun.charAt(noun.length - 1) === 's' && (noun.substr(0, noun.length - 1) in result))
-					return process(noun.substr(0, noun.length - 1), result, callback, decoration);
-				return false;
+				if (key.charAt(key.length - 1) !== 's' || !(key.substr(0, key.length - 1) in result))
+					return false;
+
+				key = key.substr(0, key.length - 1);
 			}
 
-			if (result[noun] instanceof Array)
-				for (i = 0; i < result[noun].length; ++i)
-					list.push(new Item(noun, result[noun][i], decoration));
+			if (result[key] instanceof Array)
+				for (i = 0; i < result[key].length; ++i)
+					list.push(new Item(noun, result[key][i], decoration));
 			else
-				list = new Item(noun, result[noun], decoration);
+				list = new Item(noun, result[key], decoration);
 
 			if ('links' in result && 'pages' in result.links && 'next' in result.links.pages)
 				next = function(callback){
 					request('get', result.links.pages.next, '', function(error, result, next){
 						if (error)
 							return callback(error);
-						return process(noun, result, callback, decoration);
+						return process(key, result, callback, decoration);
 					});
 				};
 
@@ -292,7 +297,7 @@
 				var key, settings;
 
 				for (key in data)
-					Decorator().property(item, key, data[key]);
+					new Decorator().property(item, key, data[key]);
 
 				for (key in decoration)
 				{
@@ -312,7 +317,12 @@
 					}
 					else
 					{
-						decorateMethod(key, decoration[key]);
+						decorateMethod(key, kx.combine({
+							endpoint: '{id}/' + key,
+							param: {
+								id: item.id
+							}
+						}, decoration[key]));
 					}
 				}
 			}
@@ -328,12 +338,12 @@
 			 */
 			function decorateMethod(key, settings)
 			{
-				Decorator().method(item, key, settings, function(param, callback){
-					request(settings.method || 'get', [noun, resolve(settings.endpoint, param)].join('/'), param, function(error, result, next){
+				new Decorator().method(item, key, settings, function(param, callback){
+					request(settings.method || 'get', [noun, 'endpoint' in settings ? resolve(settings.endpoint, param) : ''].join('/'), param, function(error, result, next){
 						if (error)
 							return callback(error);
 
-						return process(noun, result, callback, decoration);
+						return process(key, result, callback);
 					});
 				});
 			}
@@ -396,7 +406,7 @@
 			 */
 			function decorateMethod(key, settings)
 			{
-				Decorator().method(endpoint, key, settings, function(param, callback){
+				new Decorator().method(endpoint, key, settings, function(param, callback){
 					request(settings.method || 'get', [noun, resolve(settings.endpoint, param)].join('/'), param, function(error, result, next){
 						if (error)
 							return callback(error);
