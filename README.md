@@ -111,7 +111,7 @@ DOv2.Actions.list(function(error, result, next){
 });
 ```
 Output will be similar to:
-```json
+```javascript
 [
 	{
 		id: 12345678,
@@ -142,7 +142,7 @@ DOv2.Actions.id(12345678, function(error, result){
 });
 ```
 Output will be similar to:
-```json
+```javascript
 {
 	id: 12345678,
 	status: "completed",
@@ -171,7 +171,7 @@ DOv2.Droplets.list(function(error, result, next){
 });
 ```
 Output will be similar to:
-```json
+```javascript
 [
 	{
 		actionsIds: [
@@ -264,7 +264,7 @@ DOv2.Droplets.id(7890, function(error, result){
 });
 ```
 The output will be similar to
-```json
+```javascript
 {
 	actionsIds: [
 		1234, 2345, ..., 3456
@@ -356,7 +356,7 @@ DOv2.Regions.list(function(error, result, next){
 });
 ```
 Output will be similar to:
-```json
+```javascript
 [
 	{
 		available: true,
@@ -390,7 +390,7 @@ DOv2.Sizes.list(function(error, result, next){
 });
 ```
 Output will be similar to:
-```json
+```javascript
 [
 	{
 		disk: 20,
