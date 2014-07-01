@@ -93,6 +93,17 @@ kx.ready(function(){
 });
 ```
 
+###API
+[x] [Actions]{#Actions)
+	- [x] [list](#Actions)
+	- [x] [id](#Actions.id)
+[ ] Domains
+[x] Droplets
+[x] Images
+[ ] Keys
+[x] Regions
+[x] Size
+
 
 ###Usage
 ####Actions
@@ -128,7 +139,7 @@ Output will be similar to:
 ]
 ```
 
-#####`id` method
+#####`Actions.id` method
 Actions can also be retrieved individually by their id's
 ```javascript
 DOv2.Actions.id(12345678, function(error, result){
