@@ -5,7 +5,25 @@ Full client-side javascript implementation of the [Digital Ocean v2 (beta) API](
 ##Token
 You first need to create a token for your account, this token is then provided to the library.
 ```javascript
-DOv2.token('<your token here>');
+//  I am inclined to provide a proper example which asks for your API token and then
+//  stores it in localStorage, of course you could hardcode your token (and push it onto your production website for
+//  the world to play with your instances).
+
+//  see of we can obtain the token from localStorage
+var token = localStorage.getItem('DOAPIToken');
+
+//  if no token is found, we ask for it
+if (!token)
+{
+	token = prompt('Your DigitalOcean API token please');
+
+	//  ask permission to store the token in localStorage
+	if (confirm('Do you want to save this token in localStorage?'))
+		localStorage.setItem('DOAPIToken', token);
+}
+
+//  and finally pass on the token to the DOv2 instance.
+DOv2.token(token);
 ```
 
 ##Implementation Basics
@@ -59,8 +77,11 @@ You can [get your copy of konflux here](http://build.konfirm.net) (I developed a
 In case you're wondering if it sports a 'Document Ready' event:
 ```javascript
 kx.ready(function(){
-	DOv2.token('<insert token>');
+	//  please refer to the elaborate example on top of this page on how to safely have the convenience of being able
+	//  to refresh without entering the token or (worse!) hardcoding it.
+	DOv2.token(token);
 
+	//  Obtain the first bunch of actions
 	DOv2.Actions.list(function(error, result, next){
 		if (error)
 			throw new Error(error);
@@ -70,6 +91,7 @@ kx.ready(function(){
 		if (next)
 			console.log('And there is even more');
 	});
+});
 ```
 
 
