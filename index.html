@@ -1,0 +1,492 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>DigitalOcean API v2 by rspieker</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>DigitalOcean API v2</h1>
+        <p>Full client-side implementation of the Digital Ocean v2 (beta) API</p>
+        <p class="view"><a href="https://github.com/rspieker/digitalocean_v2">View the Project on GitHub <small>rspieker/digitalocean_v2</small></a></p>
+        <ul>
+          <li><a href="https://github.com/rspieker/digitalocean_v2/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/rspieker/digitalocean_v2/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/rspieker/digitalocean_v2">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="digital-ocean-api-v2" class="anchor" href="#digital-ocean-api-v2"><span class="octicon octicon-link"></span></a>Digital Ocean API v2</h1>
+
+<p>Full client-side javascript implementation of the <a href="https://developers.digitalocean.com/v2/">Digital Ocean v2 (beta) API</a>.</p>
+
+<h2>
+<a name="implementation-basics" class="anchor" href="#implementation-basics"><span class="octicon octicon-link"></span></a>Implementation Basics</h2>
+
+<p>A great deal of effort has been put in by the Digital Ocean devs to implement a consistent API, this implementation honors that by providing a very uniform interface, matching the entire API in the same consistent manner.</p>
+
+<h3>
+<a name="main-interfaces" class="anchor" href="#main-interfaces"><span class="octicon octicon-link"></span></a>Main Interfaces</h3>
+
+<p>All of the (current) Digital Ocean API main interfaces are represented by an object of its own, all of these implement the <code>list</code> method which is used to obtain the overview of items in that interface.</p>
+
+<h3>
+<a name="method-signature" class="anchor" href="#method-signature"><span class="octicon octicon-link"></span></a>Method signature</h3>
+
+<p>All methods follow the same simple convention; the last argument is always the callback function. The majority of methods does not require any other arguments. If no callback was provided an error is thrown:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">//  invoking the droplet.rename method without callback</span>
+<span class="nb">Error</span><span class="o">:</span> <span class="nx">No</span> <span class="nx">callback</span> <span class="kd">function</span> <span class="nx">provided</span> <span class="k">for</span> <span class="nx">rename</span> <span class="nx">method</span>
+</pre></div>
+
+<p>If any argument is required and a callback function is provided, the callback will be invoke with the error argument populated with an object indicating what is missing.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">//  invoking the droplet.rename method without name</span>
+<span class="p">{</span> <span class="nx">id</span><span class="o">:</span> <span class="s1">'error_name'</span><span class="p">,</span> <span class="nx">message</span><span class="o">:</span> <span class="s1">'Missing argument(s): "name" for rename method'</span> <span class="p">}</span>
+</pre></div>
+
+<h3>
+<a name="callback-signature" class="anchor" href="#callback-signature"><span class="octicon octicon-link"></span></a>Callback signature</h3>
+
+<p>Our callback signature follows the same syntax commonly used for nodejs async functions: <code>function(error, result [, next])</code>.</p>
+
+<ul>
+<li>
+<code>error</code>: If there are any errors, the error argument will be <code>true</code>-ish (not <code>null</code>, which is the default value), this is typically an object containing an id and a message.</li>
+<li>
+<code>result</code>: If there are no errors, the result argument is populated with either an array (for <code>list</code> calls) or an object (for individual item calls)</li>
+<li>
+<code>next</code>: If the API responded with an indication that there are more items in the list, the <code>next</code> argument will be a function which can be called (with one argument, a callback function), the <code>next</code> argument will be empty if there is no more to fetch for the call.</li>
+</ul><h3>
+<a name="camelcase" class="anchor" href="#camelcase"><span class="octicon octicon-link"></span></a>CamelCase</h3>
+
+<p>Our eyes bleed when using an Object Oriented notation which has underscores in method names, hence we provide a lowerCamelCased API in our implementation, both in execution and response keys, but never in response values.</p>
+
+<h3>
+<a name="limits" class="anchor" href="#limits"><span class="octicon octicon-link"></span></a>Limits</h3>
+
+<h4>
+<a name="rate-limit" class="anchor" href="#rate-limit"><span class="octicon octicon-link"></span></a>Rate-limit</h4>
+
+<p>The API is reasonably rate-limited to 1200 request per hour, if you exceed this, you will receive an error about having reached the limits (I personally believe congratulations would've in order here, as I never ran into these limits developing the library, which required a lot of requests in order to test).</p>
+
+<h4>
+<a name="item-limit" class="anchor" href="#item-limit"><span class="octicon octicon-link"></span></a>Item-limit</h4>
+
+<p>The Digital Ocean devs have implemented a very sane default of 25 items per page, I have not implemented means to change this. Please open an issue if you need to influence the default (I will be curious for the 'why', so you might add it to the request upfront).</p>
+
+<h2>
+<a name="token" class="anchor" href="#token"><span class="octicon octicon-link"></span></a>Token</h2>
+
+<p>You first need to <a href="https://www.digitalocean.com/community/tutorials/how-to-use-the-digitalocean-api-v2">create a token</a> for your account, this token is then provided to the library.
+I am inclined to provide a proper example which asks for your API token and then stores it in localStorage, of course you could hardcode your token (and push it onto your production website for the world to play with your instances), but I <em>strongly urge you not to</em> (if you insist on doing this, please make sure to give me the link too).</p>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">//  see of we can obtain the token from localStorage</span>
+<span class="kd">var</span> <span class="nx">token</span> <span class="o">=</span> <span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">'DOAPIToken'</span><span class="p">);</span>
+
+<span class="c1">//  if no token is found, we ask for it</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">token</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nx">token</span> <span class="o">=</span> <span class="nx">prompt</span><span class="p">(</span><span class="s1">'Your DigitalOcean API token please'</span><span class="p">);</span>
+
+    <span class="c1">//  ask permission to store the token in localStorage</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">confirm</span><span class="p">(</span><span class="s1">'Do you want to save this token in localStorage?'</span><span class="p">))</span>
+        <span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">'DOAPIToken'</span><span class="p">,</span> <span class="nx">token</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">//  and finally pass on the token to the DOv2 instance.</span>
+<span class="nx">DOv2</span><span class="p">.</span><span class="nx">token</span><span class="p">(</span><span class="nx">token</span><span class="p">);</span>
+</pre></div>
+
+<h2>
+<a name="implementation" class="anchor" href="#implementation"><span class="octicon octicon-link"></span></a>Implementation</h2>
+
+<p>The library tries to stay out of the global scope as much as possible, the only 'polution' is the <code>DOv2</code> object, this contains all of the functionality.</p>
+
+<h3>
+<a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h3>
+
+<p>While a stand-alone XMLHTTPRequest implementation could've been written, I chose the Konflux library, it's mine, so why not plug it ;-)</p>
+
+<h4>
+<a name="token-1" class="anchor" href="#token-1"><span class="octicon octicon-link"></span></a>Token</h4>
+
+<p>A token is always required, there are no calls that go without.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">DOv2</span><span class="p">.</span><span class="nx">token</span><span class="p">(</span><span class="s1">'&lt;your token here&gt;'</span><span class="p">);</span>
+</pre></div>
+
+<h4>
+<a name="konflux" class="anchor" href="#konflux"><span class="octicon octicon-link"></span></a>Konflux</h4>
+
+<p>You can <a href="http://build.konfirm.net">get your copy of konflux here</a> (I developed against the 'develop' build). Make sure to have the proper order in your source, konflux first, digitalocean.js after.
+In case you're wondering if it sports a 'Document Ready' event:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">kx</span><span class="p">.</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+    <span class="c1">//  please refer to the elaborate example on top of this page on how to safely have the convenience of being able</span>
+    <span class="c1">//  to refresh without entering the token or (worse!) hardcoding it.</span>
+    <span class="nx">DOv2</span><span class="p">.</span><span class="nx">token</span><span class="p">(</span><span class="nx">token</span><span class="p">);</span>
+
+    <span class="c1">//  your DOv2 calls follow here...</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h3>
+
+<h4>
+<a name="actions" class="anchor" href="#actions"><span class="octicon octicon-link"></span></a>Actions</h4>
+
+<p>Actions is an API call which lists all (limited to 25 per call) actions which have taken place on your account.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">//  Obtain the first bunch of actions</span>
+<span class="nx">DOv2</span><span class="p">.</span><span class="nx">Actions</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">,</span> <span class="nx">next</span><span class="p">){</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+
+    <span class="c1">//  result is an Array containing one Object per action</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">next</span><span class="p">)</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'And there is more...'</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>Output will be similar to:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="p">[</span>
+    <span class="p">{</span>
+        <span class="nx">id</span><span class="o">:</span> <span class="mi">12345678</span><span class="p">,</span>
+        <span class="nx">status</span><span class="o">:</span> <span class="s2">"completed"</span><span class="p">,</span>
+        <span class="nx">type</span><span class="o">:</span> <span class="s2">"reboot"</span><span class="p">,</span>
+        <span class="nx">startedAt</span><span class="o">:</span> <span class="s2">"2014-07-01T08:31:44Z"</span><span class="p">,</span>
+        <span class="nx">completedAt</span><span class="o">:</span> <span class="s2">"2014-07-01T08:32:06Z"</span><span class="p">,</span>
+        <span class="nx">resourceId</span><span class="o">:</span> <span class="mi">1859761</span><span class="p">,</span>
+        <span class="nx">resourceType</span><span class="o">:</span> <span class="s2">"droplet"</span><span class="p">,</span>
+        <span class="nx">region</span><span class="o">:</span> <span class="s2">"nyc1"</span>
+    <span class="p">}</span>
+    <span class="p">,</span>
+    <span class="p">...</span>
+<span class="p">]</span>
+</pre></div>
+
+<h5>
+<a name="id-method" class="anchor" href="#id-method"><span class="octicon octicon-link"></span></a>
+<code>id</code> method</h5>
+
+<p>Actions can also be retrieved individually by their id's</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">DOv2</span><span class="p">.</span><span class="nx">Actions</span><span class="p">.</span><span class="nx">id</span><span class="p">(</span><span class="mi">12345678</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">){</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+
+    <span class="c1">//  result is a single Object</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+
+    <span class="c1">//  no next, there can be only one...</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>Output will be similar to:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="p">{</span>
+    <span class="nx">id</span><span class="o">:</span> <span class="mi">12345678</span><span class="p">,</span>
+    <span class="nx">status</span><span class="o">:</span> <span class="s2">"completed"</span><span class="p">,</span>
+    <span class="nx">type</span><span class="o">:</span> <span class="s2">"reboot"</span><span class="p">,</span>
+    <span class="nx">startedAt</span><span class="o">:</span> <span class="s2">"2014-07-01T08:31:44Z"</span><span class="p">,</span>
+    <span class="nx">completedAt</span><span class="o">:</span> <span class="s2">"2014-07-01T08:32:06Z"</span><span class="p">,</span>
+    <span class="nx">resourceId</span><span class="o">:</span> <span class="mi">1234567</span><span class="p">,</span>
+    <span class="nx">resourceType</span><span class="o">:</span> <span class="s2">"droplet"</span><span class="p">,</span>
+    <span class="nx">region</span><span class="o">:</span> <span class="s2">"nyc1"</span>
+<span class="p">}</span>
+</pre></div>
+
+<h4>
+<a name="droplets" class="anchor" href="#droplets"><span class="octicon octicon-link"></span></a>Droplets</h4>
+
+<p>With the Droplets API you can inspect and control your droplets.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">DOv2</span><span class="p">.</span><span class="nx">Droplets</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">,</span> <span class="nx">next</span><span class="p">){</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+
+    <span class="c1">//  result is an Array containing one Object per droplet</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">next</span><span class="p">)</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'And there is more...'</span><span class="p">);</span>
+
+<span class="p">});</span>
+</pre></div>
+
+<p>Output will be similar to:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="p">[</span>
+    <span class="p">{</span>
+        <span class="nx">actionsIds</span><span class="o">:</span> <span class="p">[</span>
+            <span class="mi">1234</span><span class="p">,</span> <span class="mi">2345</span><span class="p">,</span> <span class="p">...,</span> <span class="mi">3456</span>
+        <span class="p">],</span>
+        <span class="nx">actions</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">backupId</span><span class="o">:</span> <span class="p">[</span>
+            <span class="mi">4567</span><span class="p">,</span> <span class="mi">5678</span><span class="p">,</span> <span class="p">...,</span> <span class="mi">6789</span>
+        <span class="p">],</span>
+        <span class="nx">backups</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">changeKernel</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">destroy</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">disableBackups</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">enableIPv6</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">enablePrivateNetworking</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">id</span><span class="o">:</span> <span class="mi">7890</span><span class="p">,</span>
+        <span class="nx">kernel</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">id</span><span class="o">:</span> <span class="mi">8901</span><span class="p">,</span>
+            <span class="nx">name</span><span class="o">:</span> <span class="s2">"Ubuntu 14.04 x64 vmlinuz-3.13.0-24-generic (1221)"</span><span class="p">,</span>
+            <span class="nx">version</span><span class="o">:</span> <span class="s2">"3.13.0-24-generic"</span>
+        <span class="p">},</span>
+        <span class="nx">kernels</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">locked</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s2">"My Awesome Droplet"</span><span class="p">,</span>
+        <span class="nx">networks</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">v4</span><span class="o">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="nx">gateway</span><span class="o">:</span> <span class="s1">'x.x.x.x'</span><span class="p">,</span>
+                    <span class="nx">ipAddress</span><span class="o">:</span> <span class="s1">'y.y.y.y'</span><span class="p">,</span>
+                    <span class="nx">netmask</span><span class="o">:</span> <span class="s1">'z.z.z.z'</span><span class="p">,</span>
+                    <span class="nx">type</span><span class="o">:</span> <span class="s1">'private'</span>
+                <span class="p">},</span>
+                <span class="p">...</span>
+            <span class="p">],</span>
+            <span class="nx">v6</span><span class="o">:</span> <span class="p">[]</span>  <span class="c1">//  (only in Singapore atm)</span>
+        <span class="p">},</span>
+        <span class="nx">passwordReset</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">powerCycle</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">powerOff</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">powerOn</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">reboot</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">rebuild</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">region</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">available</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+            <span class="nx">features</span><span class="o">:</span> <span class="p">[</span>
+                <span class="s1">'virtio'</span><span class="p">,</span> <span class="s1">'private_networking'</span><span class="p">,</span> <span class="s1">'backups'</span>
+            <span class="p">],</span>
+            <span class="nx">name</span><span class="o">:</span> <span class="s1">'New York 1'</span><span class="p">,</span>
+            <span class="nx">sizes</span><span class="o">:</span> <span class="p">[</span>
+                <span class="s1">'512mb'</span><span class="p">,</span> <span class="s1">'1gb'</span><span class="p">,</span> <span class="p">...,</span> <span class="s1">'64gb'</span>
+            <span class="p">],</span>
+            <span class="nx">slug</span><span class="o">:</span> <span class="s1">'nyc1'</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="nx">rename</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">resize</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">restore</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">shutdown</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">size</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">disk</span><span class="o">:</span> <span class="mi">20</span><span class="p">,</span>
+            <span class="nx">memory</span><span class="o">:</span> <span class="mi">512</span><span class="p">,</span>
+            <span class="nx">priceHourly</span><span class="o">:</span> <span class="s1">'0.00744'</span><span class="p">,</span>
+            <span class="nx">priceMonthly</span><span class="o">:</span> <span class="s1">'5.0'</span><span class="p">,</span>
+            <span class="nx">regions</span><span class="o">:</span> <span class="p">[</span>
+                <span class="s1">'nyc1'</span><span class="p">,</span> <span class="s1">'sgp1'</span><span class="p">,</span> <span class="p">...,</span> <span class="s1">'nyc2'</span>
+            <span class="p">],</span>
+            <span class="nx">slug</span><span class="o">:</span> <span class="s1">'512mb'</span><span class="p">,</span>
+            <span class="nx">transfer</span><span class="o">:</span> <span class="mi">1000</span><span class="p">,</span>
+            <span class="nx">vcpus</span><span class="o">:</span> <span class="mi">1</span>
+        <span class="p">},</span>
+        <span class="nx">snapshopIds</span><span class="o">:</span> <span class="p">[</span>
+            <span class="mi">9012</span><span class="p">,</span> <span class="mi">9876</span><span class="p">,</span> <span class="p">...,</span> <span class="mi">8765</span>
+        <span class="p">],</span>
+        <span class="nx">snapshots</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="nx">status</span><span class="o">:</span> <span class="s1">'off'</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+
+<p>You may have noticed how there are several member indicated as function on the items in the result array, these are the droplet instance actions, on which more in a bit.</p>
+
+<h5>
+<a name="id-method-1" class="anchor" href="#id-method-1"><span class="octicon octicon-link"></span></a>
+<code>id</code> method</h5>
+
+<p>In order to obtain a specific droplet by its id, you can use the <code>id</code> method</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">DOv2</span><span class="p">.</span><span class="nx">Droplets</span><span class="p">.</span><span class="nx">id</span><span class="p">(</span><span class="mi">7890</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">){</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+
+    <span class="c1">//  result is a single Object</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+
+    <span class="c1">//  no next, there can be only one...</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>The output will be similar to</p>
+
+<div class="highlight highlight-javascript"><pre><span class="p">{</span>
+    <span class="nx">actionsIds</span><span class="o">:</span> <span class="p">[</span>
+        <span class="mi">1234</span><span class="p">,</span> <span class="mi">2345</span><span class="p">,</span> <span class="p">...,</span> <span class="mi">3456</span>
+    <span class="p">],</span>
+    <span class="nx">actions</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">backupId</span><span class="o">:</span> <span class="p">[</span>
+        <span class="mi">4567</span><span class="p">,</span> <span class="mi">5678</span><span class="p">,</span> <span class="p">...,</span> <span class="mi">6789</span>
+    <span class="p">],</span>
+    <span class="nx">backups</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">changeKernel</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">destroy</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">disableBackups</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">enableIPv6</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">enablePrivateNetworking</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">id</span><span class="o">:</span> <span class="mi">7890</span><span class="p">,</span>
+    <span class="nx">kernel</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">id</span><span class="o">:</span> <span class="mi">8901</span><span class="p">,</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s2">"Ubuntu 14.04 x64 vmlinuz-3.13.0-24-generic (1221)"</span><span class="p">,</span>
+        <span class="nx">version</span><span class="o">:</span> <span class="s2">"3.13.0-24-generic"</span>
+    <span class="p">},</span>
+    <span class="nx">kernels</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">locked</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s2">"My Awesome Droplet"</span><span class="p">,</span>
+    <span class="nx">networks</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">v4</span><span class="o">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="nx">gateway</span><span class="o">:</span> <span class="s1">'x.x.x.x'</span><span class="p">,</span>
+                <span class="nx">ipAddress</span><span class="o">:</span> <span class="s1">'y.y.y.y'</span><span class="p">,</span>
+                <span class="nx">netmask</span><span class="o">:</span> <span class="s1">'z.z.z.z'</span><span class="p">,</span>
+                <span class="nx">type</span><span class="o">:</span> <span class="s1">'private'</span>
+            <span class="p">},</span>
+            <span class="p">...</span>
+        <span class="p">],</span>
+        <span class="nx">v6</span><span class="o">:</span> <span class="p">[]</span>  <span class="c1">//  (only in Singapore atm)</span>
+    <span class="p">},</span>
+    <span class="nx">passwordReset</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">powerCycle</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">powerOff</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">powerOn</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">reboot</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">rebuild</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">region</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">available</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nx">features</span><span class="o">:</span> <span class="p">[</span>
+            <span class="s1">'virtio'</span><span class="p">,</span> <span class="s1">'private_networking'</span><span class="p">,</span> <span class="s1">'backups'</span>
+        <span class="p">],</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s1">'New York 1'</span><span class="p">,</span>
+        <span class="nx">sizes</span><span class="o">:</span> <span class="p">[</span>
+            <span class="s1">'512mb'</span><span class="p">,</span> <span class="s1">'1gb'</span><span class="p">,</span> <span class="p">...,</span> <span class="s1">'64gb'</span>
+        <span class="p">],</span>
+        <span class="nx">slug</span><span class="o">:</span> <span class="s1">'nyc1'</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="nx">rename</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">resize</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">restore</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">shutdown</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">size</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">disk</span><span class="o">:</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="nx">memory</span><span class="o">:</span> <span class="mi">512</span><span class="p">,</span>
+        <span class="nx">priceHourly</span><span class="o">:</span> <span class="s1">'0.00744'</span><span class="p">,</span>
+        <span class="nx">priceMonthly</span><span class="o">:</span> <span class="s1">'5.0'</span><span class="p">,</span>
+        <span class="nx">regions</span><span class="o">:</span> <span class="p">[</span>
+            <span class="s1">'nyc1'</span><span class="p">,</span> <span class="s1">'sgp1'</span><span class="p">,</span> <span class="p">...,</span> <span class="s1">'nyc2'</span>
+        <span class="p">],</span>
+        <span class="nx">slug</span><span class="o">:</span> <span class="s1">'512mb'</span><span class="p">,</span>
+        <span class="nx">transfer</span><span class="o">:</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="nx">vcpus</span><span class="o">:</span> <span class="mi">1</span>
+    <span class="p">},</span>
+    <span class="nx">snapshopIds</span><span class="o">:</span> <span class="p">[</span>
+        <span class="mi">9012</span><span class="p">,</span> <span class="mi">9876</span><span class="p">,</span> <span class="p">...,</span> <span class="mi">8765</span>
+    <span class="p">],</span>
+    <span class="nx">snapshots</span><span class="o">:</span> <span class="o">&lt;</span><span class="kd">function</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">status</span><span class="o">:</span> <span class="s1">'off'</span>
+<span class="p">}</span>
+</pre></div>
+
+<h4>
+<a name="regions" class="anchor" href="#regions"><span class="octicon octicon-link"></span></a>Regions</h4>
+
+<p>Regions is a simple API call, listing all the available regions</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">DOv2</span><span class="p">.</span><span class="nx">Regions</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">,</span> <span class="nx">next</span><span class="p">){</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+
+    <span class="c1">//  result is an Array containing one Object per region</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">next</span><span class="p">)</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'And there is more...'</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>Output will be similar to:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="p">[</span>
+    <span class="p">{</span>
+        <span class="nx">available</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="nx">features</span><span class="o">:</span> <span class="p">[</span>
+            <span class="s2">"virtio"</span><span class="p">,</span> <span class="s2">"backups"</span>
+        <span class="p">],</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s2">"New York 1"</span><span class="p">,</span>
+        <span class="nx">sizes</span><span class="o">:</span> <span class="p">[</span>
+            <span class="s2">"512mb"</span><span class="p">,</span> <span class="s2">"1gb"</span><span class="p">,</span> <span class="p">...,</span> <span class="s2">"64gb"</span>
+        <span class="p">],</span>
+        <span class="nx">slug</span><span class="o">:</span> <span class="s2">"nyc1"</span>
+    <span class="p">}</span>
+    <span class="p">,</span>
+    <span class="p">...</span>
+<span class="p">]</span>
+</pre></div>
+
+<h4>
+<a name="sizes" class="anchor" href="#sizes"><span class="octicon octicon-link"></span></a>Sizes</h4>
+
+<p>Sizes is an API call which lists all (limited to 25 per call) available sizes (for droplets).</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">DOv2</span><span class="p">.</span><span class="nx">Sizes</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">error</span><span class="p">,</span> <span class="nx">result</span><span class="p">,</span> <span class="nx">next</span><span class="p">){</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+
+    <span class="c1">//  result is an Array containing one Object per size</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">size</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">next</span><span class="p">)</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'And there is more...'</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>Output will be similar to:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="p">[</span>
+    <span class="p">{</span>
+        <span class="nx">disk</span><span class="o">:</span> <span class="mi">20</span><span class="p">,</span>
+        <span class="nx">memory</span><span class="o">:</span> <span class="mi">512</span><span class="p">,</span>
+        <span class="nx">priceHourly</span><span class="o">:</span> <span class="s2">"0.00744"</span><span class="p">,</span>
+        <span class="nx">priceMonthly</span><span class="o">:</span> <span class="s2">"5.0"</span><span class="p">,</span>
+        <span class="nx">regions</span><span class="o">:</span> <span class="p">[</span>
+            <span class="s2">"nyc1"</span><span class="p">,</span> <span class="s2">"sgp1"</span><span class="p">,</span> <span class="p">...,</span> <span class="s2">"nyc2"</span>
+        <span class="p">],</span>
+        <span class="nx">slug</span><span class="o">:</span> <span class="s2">"512mb"</span><span class="p">,</span>
+        <span class="nx">transfer</span><span class="o">:</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="nx">vcpus</span><span class="o">:</span> <span class="mi">1</span>
+    <span class="p">}</span>
+    <span class="p">,</span>
+    <span class="p">...</span>
+<span class="p">]</span>
+</pre></div>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/rspieker">rspieker</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
