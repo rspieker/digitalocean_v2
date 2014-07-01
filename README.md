@@ -43,7 +43,7 @@ The Digital Ocean devs have implemented a very sane default of 25 items per page
 
 
 ##Token
-You first need to create a token for your account, this token is then provided to the library.
+You first need to [create a token](https://www.digitalocean.com/community/tutorials/how-to-use-the-digitalocean-api-v2) for your account, this token is then provided to the library.
 I am inclined to provide a proper example which asks for your API token and then stores it in localStorage, of course you could hardcode your token (and push it onto your production website for the world to play with your instances), but I *strongly urge you not to* (if you insist on doing this, please make sure to give me the link too).
 
 ```javascript
