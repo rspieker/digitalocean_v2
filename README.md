@@ -94,7 +94,7 @@ kx.ready(function(){
 ```
 
 ###API
-- [x] [Actions]{#Actions)
+- [x] Actions
 	- [x] [list](#actions)
 	- [x] [id](#actionsid-method)
 - [ ] Domains
@@ -373,7 +373,7 @@ The output will be similar to
 ```
 #####Droplet item methods
 The droplet items returned by DOv2 are automatically decorated with methods implementing the targetted API calls, you obtain a droplet item by processing the result of either `DOv2.Droplets.list` of `DOv2.Droplets.id`.
-######`Droplets.kernels`
+######`Droplets.kernels` method
 Obtain all available kernels for the droplet
 ```javascript
 droplet.kernels(function(error, kernels, next){
@@ -396,7 +396,7 @@ Output will be similar too:
 ]
 ```
 
-######`Droplets.snapshots`
+######`Droplets.snapshots` method
 Obtain all snapshots for the droplet
 ```javascript
 droplet.snapshots(function(error, snapshots, next){
@@ -426,7 +426,7 @@ Output will be similar too:
 ]
 ```
 
-######`Droplets.backups`
+######`Droplets.backups` method
 Obtain all backups for the droplet
 ```javascript
 droplet.backups(function(error, backups, next){
@@ -456,49 +456,49 @@ Output will be similar too:
 ]
 ```
 
-######`Droplets.destroy`
+######`Droplets.destroy` method
 TODO: document workings
 
-######`Droplets.actions`
+######`Droplets.actions` method
 TODO: document workings
 
-######`Droplets.reboot`
+######`Droplets.reboot` method
 TODO: document workings
 
-######`Droplets.powerCycle`
+######`Droplets.powerCycle` method
 TODO: document workings
 
-######`Droplets.powerOn`
+######`Droplets.powerOn` method
 TODO: document workings
 
-######`Droplets.powerOff`
+######`Droplets.powerOff` method
 TODO: document workings
 
-######`Droplets.passwordReset`
+######`Droplets.passwordReset` method
 TODO: document workings
 
-######`Droplets.resize`
+######`Droplets.resize` method
 TODO: document workings
 
-######`Droplets.restore`
+######`Droplets.restore` method
 TODO: document workings
 
-######`Droplets.rebuild`
+######`Droplets.rebuild` method
 TODO: document workings
 
-######`Droplets.rename`
+######`Droplets.rename` method
 TODO: document workings
 
-######`Droplets.changeKernel`
+######`Droplets.changeKernel` method
 TODO: document workings
 
-######`Droplets.enableIPv6`
+######`Droplets.enableIPv6` method
 TODO: document workings
 
-######`Droplets.disableBackups`
+######`Droplets.disableBackups` method
 TODO: document workings
 
-######`Droplets.enablePrivateNetworking`
+######`Droplets.enablePrivateNetworking` method
 TODO: document workings
 
 
