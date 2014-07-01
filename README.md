@@ -190,7 +190,7 @@ Output will be similar to:
 		id: 7890,
 		kernel: {
 			id: 8901,
-			name: "Ubuntu 14.04 x64 vmlinuz-3.13.0-24-generic (1221)",
+			name: "Ubuntu 14.04 x64 vmlinuz-3.13.0-24-generic (8901)",
 			version: "3.13.0-24-generic"
 		},
 		kernels: <function>,
@@ -250,6 +250,7 @@ Output will be similar to:
 ]
 ```
 You may have noticed how there are several member indicated as function on the items in the result array, these are the droplet instance actions, on which more in a bit.
+
 #####`id` method
 In order to obtain a specific droplet by its id, you can use the `id` method
 ```javascript
@@ -282,7 +283,7 @@ The output will be similar to
 	id: 7890,
 	kernel: {
 		id: 8901,
-		name: "Ubuntu 14.04 x64 vmlinuz-3.13.0-24-generic (1221)",
+		name: "Ubuntu 14.04 x64 vmlinuz-3.13.0-24-generic (8901)",
 		version: "3.13.0-24-generic"
 	},
 	kernels: <function>,
@@ -340,6 +341,137 @@ The output will be similar to
 	status: 'off'
 }
 ```
+#####Droplet item methods
+The droplet items returned by DOv2 are automatically decorated with methods implementing the targetted API calls, you obtain a droplet item by processing the result of either `DOv2.Droplets.list` of `DOv2.Droplets.id`.
+######`kernels`
+Obtain all available kernels for the droplet
+```javascript
+droplet.kernels(function(error, kernels, next){
+	if (!error)
+		console.log(kernels);
+
+	if (next)
+		console.log('There is more...');
+});
+```
+Output will be similar too:
+```javascript
+[
+	{
+		id: 61,
+		name: "* Ubuntu 10.04 x32 vmlinuz-2.6.32-41-generic-pae",
+		version: "2.6.32-41-generic-pae"
+	},
+	...
+]
+```
+
+######`snapshots`
+Obtain all snapshots for the droplet
+```javascript
+droplet.snapshots(function(error, snapshots, next){
+	if (!error)
+		console.log(snapshots);
+
+	if (next)
+		console.log('There is more...');
+});
+```
+Output will be similar too:
+```javascript
+[
+  snapshots: [
+	{
+		id: 7890,
+		name: 'Ubuntu 13.04',
+		distribution: 'ubuntu',
+		slug: null,
+		public: false,
+		regions: [
+			'sgp1'
+		],
+		createdAt: '2014-06-27T21:10:26Z'
+	},
+	...
+]
+```
+
+######`backups`
+Obtain all backups for the droplet
+```javascript
+droplet.backups(function(error, backups, next){
+	if (!error)
+		console.log(backups);
+
+	if (next)
+		console.log('There is more...');
+});
+```
+Output will be similar too:
+```javascript
+[
+  backups: [
+	{
+		id: 7890,
+		name: 'Ubuntu 13.04',
+		distribution: 'ubuntu',
+		slug: null,
+		public: false,
+		regions: [
+			'sgp1'
+		],
+		createdAt: '2014-06-27T21:10:26Z'
+	},
+	...
+]
+```
+
+######`destroy`
+TODO: document workings
+
+######`actions`
+TODO: document workings
+
+######`reboot`
+TODO: document workings
+
+######`powerCycle`
+TODO: document workings
+
+######`powerOn`
+TODO: document workings
+
+######`powerOff`
+TODO: document workings
+
+######`passwordReset`
+TODO: document workings
+
+######`resize`
+TODO: document workings
+
+######`restore`
+TODO: document workings
+
+######`rebuild`
+TODO: document workings
+
+######`rename`
+TODO: document workings
+
+######`changeKernel`
+TODO: document workings
+
+######`enableIPv6`
+TODO: document workings
+
+######`disableBackups`
+TODO: document workings
+
+######`enablePrivateNetworking`
+TODO: document workings
+
+
 
 ####Regions
 Regions is a simple API call, listing all the available regions
