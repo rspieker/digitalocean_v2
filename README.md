@@ -96,9 +96,28 @@ kx.ready(function(){
 ###API
 - [x] [Actions]{#Actions)
 	- [x] [list](#actions)
-	- [x] [id](#actions.id-method)
+	- [x] [id](#actionsid-method)
 - [ ] Domains
 - [x] Droplets
+	- [x] [list](#droplets-method)
+	- [x] [id](#dropletsid-method)
+	- [x] [id](#dropletskernels-method)
+	- [x] [id](#dropletssnapshots-method)
+	- [x] [id](#dropletsbackups-method)
+	- [x] [id](#dropletsdestroy-method)
+	- [x] [id](#dropletsactions-method)
+	- [x] [id](#dropletsreboot-method)
+	- [x] [id](#dropletspowercycle-method)
+	- [x] [id](#dropletsshutdown-method)
+	- [x] [id](#dropletspoweron-method)
+	- [x] [id](#dropletspoweroff-method)
+	- [x] [id](#dropletspasswordreset-method)
+	- [x] [id](#dropletsresize-method)
+	- [x] [id](#dropletsrebuild-method)
+	- [x] [id](#dropletsrename-method)
+	- [x] [id](#dropletsenableipv6-method)
+	- [x] [id](#dropletsdisablebackups-method)
+	- [x] [id](#dropletsenableprivatepetwork-method)
 - [x] Images
 - [ ] Keys
 - [x] Regions
@@ -262,7 +281,7 @@ Output will be similar to:
 ```
 You may have noticed how there are several member indicated as function on the items in the result array, these are the droplet instance actions, on which more in a bit.
 
-#####`id` method
+#####`Droplets.id` method
 In order to obtain a specific droplet by its id, you can use the `id` method
 ```javascript
 DOv2.Droplets.id(7890, function(error, result){
@@ -354,7 +373,7 @@ The output will be similar to
 ```
 #####Droplet item methods
 The droplet items returned by DOv2 are automatically decorated with methods implementing the targetted API calls, you obtain a droplet item by processing the result of either `DOv2.Droplets.list` of `DOv2.Droplets.id`.
-######`kernels`
+######`Droplets.kernels`
 Obtain all available kernels for the droplet
 ```javascript
 droplet.kernels(function(error, kernels, next){
@@ -377,7 +396,7 @@ Output will be similar too:
 ]
 ```
 
-######`snapshots`
+######`Droplets.snapshots`
 Obtain all snapshots for the droplet
 ```javascript
 droplet.snapshots(function(error, snapshots, next){
@@ -407,7 +426,7 @@ Output will be similar too:
 ]
 ```
 
-######`backups`
+######`Droplets.backups`
 Obtain all backups for the droplet
 ```javascript
 droplet.backups(function(error, backups, next){
@@ -437,49 +456,49 @@ Output will be similar too:
 ]
 ```
 
-######`destroy`
+######`Droplets.destroy`
 TODO: document workings
 
-######`actions`
+######`Droplets.actions`
 TODO: document workings
 
-######`reboot`
+######`Droplets.reboot`
 TODO: document workings
 
-######`powerCycle`
+######`Droplets.powerCycle`
 TODO: document workings
 
-######`powerOn`
+######`Droplets.powerOn`
 TODO: document workings
 
-######`powerOff`
+######`Droplets.powerOff`
 TODO: document workings
 
-######`passwordReset`
+######`Droplets.passwordReset`
 TODO: document workings
 
-######`resize`
+######`Droplets.resize`
 TODO: document workings
 
-######`restore`
+######`Droplets.restore`
 TODO: document workings
 
-######`rebuild`
+######`Droplets.rebuild`
 TODO: document workings
 
-######`rename`
+######`Droplets.rename`
 TODO: document workings
 
-######`changeKernel`
+######`Droplets.changeKernel`
 TODO: document workings
 
-######`enableIPv6`
+######`Droplets.enableIPv6`
 TODO: document workings
 
-######`disableBackups`
+######`Droplets.disableBackups`
 TODO: document workings
 
-######`enablePrivateNetworking`
+######`Droplets.enablePrivateNetworking`
 TODO: document workings
 
 
