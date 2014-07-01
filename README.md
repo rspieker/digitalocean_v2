@@ -3,7 +3,7 @@
 Full client-side javascript implementation of the [Digital Ocean v2 (beta) API](https://developers.digitalocean.com/v2/).
 
 ##Token
-You first need to create a token for your account, this token is then provided to library.
+You first need to create a token for your account, this token is then provided to the library.
 ```javascript
 DOv2.token('<your token here>');
 ```
@@ -19,11 +19,13 @@ All of the (current) Digital Ocean API main interfaces are represented by an obj
 ###Method signature
 All methods follow the same simple convention; the last argument is always the callback function. The majority of methods does not require any other arguments. If no callback was provided an error is thrown:
 ```
+//  invoking the droplet.rename method without callback
 Error: No callback function provided for rename method
 ```
 If any argument is required and a callback function is provided, the callback will be invoke with the error argument populated with an object indicating what is missing.
 ```json
-{ id: "error_name", message: "Missing argument(s): "name" for rename method" }
+//  invoking the droplet.rename method without name
+{ id: 'error_name', message: 'Missing argument(s): "name" for rename method' }
 ```
 
 
@@ -39,7 +41,42 @@ Our eyes bleed when using an Object Oriented notation which uses underscores in 
 
 
 
-##Regions
+##Implementation
+The library tries to stay out of the global scope as much as possible, the only 'polution' is the `DOv2` object, this contains all of the functionality.
+
+
+###Dependencies
+While a stand-alone XMLHTTPRequest implementation could've been written, I chose the Konflux library, it's mine, so why not plug it ;-)
+
+####Token
+A token is always required, there are no calls that go without.
+```javascript
+DOv2.token('<your token here>');
+```
+
+####Konflux
+You can [get your copy of konflux here](http://build.konfirm.net) (I developed against the 'develop' build). Make sure to have the proper order in your source, konflux first, digitalocean.js after.
+In case you're wondering if it sports a 'Document Ready' event:
+```javascript
+kx.ready(function(){
+	DOv2.token('<insert token>');
+
+	DOv2.Actions.list(function(error, result, next){
+		if (error)
+			throw new Error(error);
+
+		console.log(result);
+
+		if (next)
+			console.log('And there is even more');
+	});
+```
+
+
+###Actions
+
+
+###Regions
 Regions is a simple API call, listing all the available regions
 ```javascript
 DOv2.Regions.list(function(error, result, next){
