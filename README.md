@@ -4,13 +4,13 @@ Full client-side javascript implementation of the [Digital Ocean v2 (beta) API](
 
 ##Token
 You first need to create a token for your account, this token is then provided to library.
-```
+```javascript
 DOv2.token('<your token here>');
 ```
 
 ##Regions
 Regions is a simple API call, listing all the available regions
-```
+```javascript
 DOv2.Regions.list(function(error, result, next){
 	if (error)
 		throw new Error(error);
@@ -20,4 +20,22 @@ DOv2.Regions.list(function(error, result, next){
 		console.log(region);
 	});
 });
+```
+Output will be similar to:
+```json
+[
+	{
+		available: true,
+		features: [
+			"virtio", "backups"
+		],
+		name: "New York 1",
+		sizes: [
+			"512mb", "1gb", ..., "64gb"
+		],
+		slug: "nyc1"
+	}
+	,
+	...
+]
 ```
