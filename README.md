@@ -93,480 +93,62 @@ kx.ready(function(){
 });
 ```
 
-###API
+###Usage
+####Getting an overview
+All API endpoints have a `list` method, which obtains an overview (paginated if needed) of the items in the endpoint.
+Lists would be your basic starting point in order to find out more detailed information such as ID's and names.
+- [x] `Actions.list` - Obtain the actions of your account ([DO Reference: List all Actions](https://developers.digitalocean.com/v2/#list-all-actions))
+- [ ] `Domains.list` - *TODO*
+- [x] `Droplets.list` - Obtain the droplets in your account ([DO Reference: List all Droplets](https://developers.digitalocean.com/v2/#list-all-droplets))
+- [x] `Images.list` - Obtain the available images, both your own images as the ones provided by Digital Ocean ([DO Reference: List all Images](https://developers.digitalocean.com/v2/#list-all-images))
+- [ ] `Keys.list` - *TODO*
+- [x] `Regions.list` - Obtain all available regions where you can create new Droplets ([DO Reference: List all Regions](https://developers.digitalocean.com/v2/#list-all-regions))
+- [x] `Sizes.list` - Obtain all available sizes for Droplets ([DO Reference: List all Sizes](https://developers.digitalocean.com/v2/#list-all-sizes))
+
+#####List Example
+```javascript
+DOv2.Droplets.list(function(error, result, next){
+	if (!error)
+		console.log(result);  //  Contains an array of Droplet items
+
+	if (next)
+	{
+		//  next is a function which expects a callback function and will retrieve the next items for this call
+		//  in this case: Droplets
+		console.log('and there are more..');
+	}
+});
+```
+
+
+####API
 - [x] Actions
-	- [x] [list](#actions)
-	- [x] [id](#actionsid-method)
+	- [x] `list`
+	- [x] `id`
 - [ ] Domains
 - [x] Droplets
-	- [x] [list](#droplets-method)
-	- [x] [id](#dropletsid-method)
-	- [x] [kernels](#dropletskernels-method)
-	- [x] [snapshots](#dropletssnapshots-method)
-	- [x] [backups](#dropletsbackups-method)
-	- [x] [destroy](#dropletsdestroy-method)
-	- [x] [actions](#dropletsactions-method)
-	- [x] [reboot](#dropletsreboot-method)
-	- [x] [powerCycle](#dropletspowercycle-method)
-	- [x] [shutdown](#dropletsshutdown-method)
-	- [x] [powerOn](#dropletspoweron-method)
-	- [x] [powerOff](#dropletspoweroff-method)
-	- [x] [passwordReset](#dropletspasswordreset-method)
-	- [x] [resize](#dropletsresize-method)
-	- [x] [rebuild](#dropletsrebuild-method)
-	- [x] [rename](#dropletsrename-method)
-	- [x] [enableIPv6](#dropletsenableipv6-method)
-	- [x] [disableBackups](#dropletsdisablebackups-method)
-	- [x] [enablePrivateNetworking](#dropletsenableprivatepetwork-method)
+	- [x] `list`
+	- [x] `id`
+	- [ ] `create` *TODO*
+	- [x] Droplet Methods
+		- [x] `kernels` - obtain a list of all available kernels for this droplet
+		- [x] `snapshots` - obtain a list of all available snapshots of this droplet
+		- [x] `backups` - obtain a list of all available backups of this droplet
+		- [x] `actions` - obtain a list of all actions for this droplet
+		- [x] `destroy` - destroy the droplet
+		- [x] `reboot` - reboot the droplet
+		- [x] `powerCycle` - turn the droplet off and on again (like successively calling `powerOff` and then `powerOn`)
+		- [x] `shutdown` - shut down a droplet
+		- [x] `powerOn` - power on the droplet
+		- [x] `powerOff` - turn the droplet off
+		- [x] `passwordReset` - request a new password (this will be sent by e-mail, not become available in the API)
+		- [x] `resize` - resize the droplet to another size *(requires the new size as first argument)*
+		- [x] `rebuild` - rebuild the droplet from an image *(requires an image id for your own images or a 'slug' (name) for DO's images as first argument)*
+		- [x] `rename` - rename the droplet *(requires a string name as first argument)*
+		- [x] `enableIPv6` - enable IPv6 on the droplet _(will only work if IPv6 is available in the region where the droplet resides)_
+		- [x] `disableBackups` - disable backups of the droplet
+		- [x] `enablePrivateNetworking` - enable private networking for the droplet
 - [x] Images
 - [ ] Keys
 - [x] Regions
 - [x] Size
-
-
-###Usage
-####Actions
-Actions is an API call which lists all (limited to 25 per call) actions which have taken place on your account.
-```javascript
-//  Obtain the first bunch of actions
-DOv2.Actions.list(function(error, result, next){
-	if (error)
-		throw new Error(error);
-
-	//  result is an Array containing one Object per action
-	console.log(result);
-
-	if (next)
-		console.log('And there is more...');
-});
-```
-Output will be similar to:
-```javascript
-[
-	{
-		id: 12345678,
-		status: "completed",
-		type: "reboot",
-		startedAt: "2014-07-01T08:31:44Z",
-		completedAt: "2014-07-01T08:32:06Z",
-		resourceId: 1859761,
-		resourceType: "droplet",
-		region: "nyc1"
-	}
-	,
-	...
-]
-```
-
-#####`Actions.id` method
-Actions can also be retrieved individually by their id's
-```javascript
-DOv2.Actions.id(12345678, function(error, result){
-	if (error)
-		throw new Error(error);
-
-	//  result is a single Object
-	console.log(result);
-
-	//  no next, there can be only one...
-});
-```
-Output will be similar to:
-```javascript
-{
-	id: 12345678,
-	status: "completed",
-	type: "reboot",
-	startedAt: "2014-07-01T08:31:44Z",
-	completedAt: "2014-07-01T08:32:06Z",
-	resourceId: 1234567,
-	resourceType: "droplet",
-	region: "nyc1"
-}
-```
-
-####Droplets
-With the Droplets API you can inspect and control your droplets.
-```javascript
-DOv2.Droplets.list(function(error, result, next){
-	if (error)
-		throw new Error(error);
-
-	//  result is an Array containing one Object per droplet
-	console.log(result);
-
-	if (next)
-		console.log('And there is more...');
-
-});
-```
-Output will be similar to:
-```javascript
-[
-	{
-		actionsIds: [
-			1234, 2345, ..., 3456
-		],
-		actions: <function>,
-		backupId: [
-			4567, 5678, ..., 6789
-		],
-		backups: <function>,
-		changeKernel: <function>,
-		destroy: <function>,
-		disableBackups: <function>,
-		enableIPv6: <function>,
-		enablePrivateNetworking: <function>,
-		id: 7890,
-		kernel: {
-			id: 8901,
-			name: "Ubuntu 14.04 x64 vmlinuz-3.13.0-24-generic (8901)",
-			version: "3.13.0-24-generic"
-		},
-		kernels: <function>,
-		locked: false,
-		name: "My Awesome Droplet",
-		networks: {
-			v4: [
-				{
-					gateway: 'x.x.x.x',
-					ipAddress: 'y.y.y.y',
-					netmask: 'z.z.z.z',
-					type: 'private'
-				},
-				...
-			],
-			v6: []  //  (only in Singapore atm)
-		},
-		passwordReset: <function>,
-		powerCycle: <function>,
-		powerOff: <function>,
-		powerOn: <function>,
-		reboot: <function>,
-		rebuild: <function>,
-		region: {
-			available: true,
-			features: [
-				'virtio', 'private_networking', 'backups'
-			],
-			name: 'New York 1',
-			sizes: [
-				'512mb', '1gb', ..., '64gb'
-			],
-			slug: 'nyc1',
-		},
-		rename: <function>,
-		resize: <function>,
-		restore: <function>,
-		shutdown: <function>,
-		size: {
-			disk: 20,
-			memory: 512,
-			priceHourly: '0.00744',
-			priceMonthly: '5.0',
-			regions: [
-				'nyc1', 'sgp1', ..., 'nyc2'
-			],
-			slug: '512mb',
-			transfer: 1000,
-			vcpus: 1
-		},
-		snapshopIds: [
-			9012, 9876, ..., 8765
-		],
-		snapshots: <function>,
-		status: 'off'
-	}
-]
-```
-You may have noticed how there are several member indicated as function on the items in the result array, these are the droplet instance actions, on which more in a bit.
-
-#####`Droplets.id` method
-In order to obtain a specific droplet by its id, you can use the `id` method
-```javascript
-DOv2.Droplets.id(7890, function(error, result){
-	if (error)
-		throw new Error(error);
-
-	//  result is a single Object
-	console.log(result);
-
-	//  no next, there can be only one...
-});
-```
-The output will be similar to
-```javascript
-{
-	actionsIds: [
-		1234, 2345, ..., 3456
-	],
-	actions: <function>,
-	backupId: [
-		4567, 5678, ..., 6789
-	],
-	backups: <function>,
-	changeKernel: <function>,
-	destroy: <function>,
-	disableBackups: <function>,
-	enableIPv6: <function>,
-	enablePrivateNetworking: <function>,
-	id: 7890,
-	kernel: {
-		id: 8901,
-		name: "Ubuntu 14.04 x64 vmlinuz-3.13.0-24-generic (8901)",
-		version: "3.13.0-24-generic"
-	},
-	kernels: <function>,
-	locked: false,
-	name: "My Awesome Droplet",
-	networks: {
-		v4: [
-			{
-				gateway: 'x.x.x.x',
-				ipAddress: 'y.y.y.y',
-				netmask: 'z.z.z.z',
-				type: 'private'
-			},
-			...
-		],
-		v6: []  //  (only in Singapore atm)
-	},
-	passwordReset: <function>,
-	powerCycle: <function>,
-	powerOff: <function>,
-	powerOn: <function>,
-	reboot: <function>,
-	rebuild: <function>,
-	region: {
-		available: true,
-		features: [
-			'virtio', 'private_networking', 'backups'
-		],
-		name: 'New York 1',
-		sizes: [
-			'512mb', '1gb', ..., '64gb'
-		],
-		slug: 'nyc1',
-	},
-	rename: <function>,
-	resize: <function>,
-	restore: <function>,
-	shutdown: <function>,
-	size: {
-		disk: 20,
-		memory: 512,
-		priceHourly: '0.00744',
-		priceMonthly: '5.0',
-		regions: [
-			'nyc1', 'sgp1', ..., 'nyc2'
-		],
-		slug: '512mb',
-		transfer: 1000,
-		vcpus: 1
-	},
-	snapshopIds: [
-		9012, 9876, ..., 8765
-	],
-	snapshots: <function>,
-	status: 'off'
-}
-```
-#####Droplet item methods
-The droplet items returned by DOv2 are automatically decorated with methods implementing the targetted API calls, you obtain a droplet item by processing the result of either `DOv2.Droplets.list` of `DOv2.Droplets.id`.
-######`Droplets.kernels` method
-Obtain all available kernels for the droplet
-```javascript
-droplet.kernels(function(error, kernels, next){
-	if (!error)
-		console.log(kernels);
-
-	if (next)
-		console.log('There is more...');
-});
-```
-Output will be similar too:
-```javascript
-[
-	{
-		id: 61,
-		name: "* Ubuntu 10.04 x32 vmlinuz-2.6.32-41-generic-pae",
-		version: "2.6.32-41-generic-pae"
-	},
-	...
-]
-```
-
-######`Droplets.snapshots` method
-Obtain all snapshots for the droplet
-```javascript
-droplet.snapshots(function(error, snapshots, next){
-	if (!error)
-		console.log(snapshots);
-
-	if (next)
-		console.log('There is more...');
-});
-```
-Output will be similar too:
-```javascript
-[
-  snapshots: [
-	{
-		id: 7890,
-		name: 'Ubuntu 13.04',
-		distribution: 'ubuntu',
-		slug: null,
-		public: false,
-		regions: [
-			'sgp1'
-		],
-		createdAt: '2014-06-27T21:10:26Z'
-	},
-	...
-]
-```
-
-######`Droplets.backups` method
-Obtain all backups for the droplet
-```javascript
-droplet.backups(function(error, backups, next){
-	if (!error)
-		console.log(backups);
-
-	if (next)
-		console.log('There is more...');
-});
-```
-Output will be similar too:
-```javascript
-[
-  backups: [
-	{
-		id: 7890,
-		name: 'Ubuntu 13.04',
-		distribution: 'ubuntu',
-		slug: null,
-		public: false,
-		regions: [
-			'sgp1'
-		],
-		createdAt: '2014-06-27T21:10:26Z'
-	},
-	...
-]
-```
-
-######`Droplets.destroy` method
-TODO: document workings
-
-######`Droplets.actions` method
-TODO: document workings
-
-######`Droplets.reboot` method
-TODO: document workings
-
-######`Droplets.powerCycle` method
-TODO: document workings
-
-######`Droplets.powerOn` method
-TODO: document workings
-
-######`Droplets.powerOff` method
-TODO: document workings
-
-######`Droplets.passwordReset` method
-TODO: document workings
-
-######`Droplets.resize` method
-TODO: document workings
-
-######`Droplets.restore` method
-TODO: document workings
-
-######`Droplets.rebuild` method
-TODO: document workings
-
-######`Droplets.rename` method
-TODO: document workings
-
-######`Droplets.changeKernel` method
-TODO: document workings
-
-######`Droplets.enableIPv6` method
-TODO: document workings
-
-######`Droplets.disableBackups` method
-TODO: document workings
-
-######`Droplets.enablePrivateNetworking` method
-TODO: document workings
-
-
-
-####Regions
-Regions is a simple API call, listing all the available regions
-```javascript
-DOv2.Regions.list(function(error, result, next){
-	if (error)
-		throw new Error(error);
-
-	//  result is an Array containing one Object per region
-	console.log(result);
-
-	if (next)
-		console.log('And there is more...');
-});
-```
-Output will be similar to:
-```javascript
-[
-	{
-		available: true,
-		features: [
-			"virtio", "backups"
-		],
-		name: "New York 1",
-		sizes: [
-			"512mb", "1gb", ..., "64gb"
-		],
-		slug: "nyc1"
-	}
-	,
-	...
-]
-```
-
-
-####Sizes
-Sizes is an API call which lists all (limited to 25 per call) available sizes (for droplets).
-```javascript
-DOv2.Sizes.list(function(error, result, next){
-	if (error)
-		throw new Error(error);
-
-	//  result is an Array containing one Object per size
-	console.log(size);
-
-	if (next)
-		console.log('And there is more...');
-});
-```
-Output will be similar to:
-```javascript
-[
-	{
-		disk: 20,
-		memory: 512,
-		priceHourly: "0.00744",
-		priceMonthly: "5.0",
-		regions: [
-			"nyc1", "sgp1", ..., "nyc2"
-		],
-		slug: "512mb",
-		transfer: 1000,
-		vcpus: 1
-	}
-	,
-	...
-]
-```
