@@ -455,11 +455,13 @@
 		 *  @type    method
 		 *  @access  public
 		 *  @param   string token
-		 *  @return  void
+		 *  @return  object api
 		 */
 		api.token = function(value)
 		{
 			token = value;
+
+			return api;
 		};
 
 
