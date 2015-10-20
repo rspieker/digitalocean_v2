@@ -340,12 +340,17 @@
 			function decorateMethod(key, settings)
 			{
 				new Decorator().method(item, key, settings, function(param, callback){
-					request(settings.method || 'get', [noun, 'endpoint' in settings ? resolve(settings.endpoint, param) : ''].join('/'), param, function(error, result, next){
-						if (error)
-							return callback(error);
+					request(
+						settings.method || 'get',
+						[noun, resolve(settings.endpoint, param)].filter(function(item) { return !!item; }).join('/'),
+						param,
+						function(error, result, next){
+							if (error)
+								return callback(error);
 
-						return process(key, result, callback);
-					});
+							return process(key, result, callback);
+						}
+					);
 				});
 			}
 
@@ -408,12 +413,17 @@
 			function decorateMethod(key, settings)
 			{
 				new Decorator().method(endpoint, key, settings, function(param, callback){
-					request(settings.method || 'get', [noun, resolve(settings.endpoint, param)].join('/'), param, function(error, result, next){
-						if (error)
-							return callback(error);
+					request(
+						settings.method || 'get',
+						[resolve(noun, param), resolve(settings.endpoint, param)].filter(function(item) { return !!item; }).join('/'),
+						param,
+						function(error, result, next){
+							if (error)
+								return callback(error);
 
-						return process(noun, result, callback, itemDecoration);
-					});
+							return process(noun, result, callback, itemDecoration);
+						}
+					);
 				});
 			}
 
