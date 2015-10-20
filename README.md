@@ -98,7 +98,7 @@ kx.ready(function(){
 All API endpoints have a `list` method, which obtains an overview (paginated if needed) of the items in the endpoint.
 Lists would be your basic starting point in order to find out more detailed information such as ID's and names.
 - [x] `Actions.list` - Obtain the actions of your account ([DO Reference: List all Actions](https://developers.digitalocean.com/v2/#list-all-actions))
-- [ ] `Domains.list` - *TODO*
+- [x] `Domains.list` - Obtain the domains in your account ([DO Reference: List all Domains](https://developers.digitalocean.com/documentation/v2/#list-all-domains))
 - [x] `Droplets.list` - Obtain the droplets in your account ([DO Reference: List all Droplets](https://developers.digitalocean.com/v2/#list-all-droplets))
 - [x] `Images.list` - Obtain the available images, both your own images as the ones provided by Digital Ocean ([DO Reference: List all Images](https://developers.digitalocean.com/v2/#list-all-images))
 - [ ] `Keys.list` - *TODO*
@@ -125,7 +125,12 @@ DOv2.Droplets.list(function(error, result, next){
 - [x] Actions
 	- [x] `list`
 	- [x] `id`
-- [ ] Domains
+- [x] Domains
+	- [x] `list`
+	- [ ] `fetch` *TODO*
+	- [ ] `create` *TODO*
+	- [ ] `destroy` *TODO*
+- [ ] DomainRecords *TODO*
 - [x] Droplets
 	- [x] `list`
 	- [x] `id`
@@ -149,6 +154,6 @@ DOv2.Droplets.list(function(error, result, next){
 		- [x] `disableBackups` - disable backups of the droplet
 		- [x] `enablePrivateNetworking` - enable private networking for the droplet
 - [x] Images
-- [ ] Keys
+- [ ] Keys *TODO*
 - [x] Regions
 - [x] Size

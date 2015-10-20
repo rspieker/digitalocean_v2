@@ -247,22 +247,23 @@
 					return false;
 
 				key = key.substr(0, key.length - 1);
+			if (result) {
+				if (result[key] instanceof Array)
+					for (i = 0; i < result[key].length; ++i)
+						list.push(new Item(noun, result[key][i], decoration));
+				else
+					list = new Item(noun, result[key], decoration);
+
+				if ('links' in result && 'pages' in result.links && 'next' in result.links.pages)
+					next = function(callback){
+						request('get', result.links.pages.next, '', function(error, result, next){
+							if (error)
+								return callback(error);
+							return process(noun, result, callback, decoration);
+						});
+					};
 			}
 
-			if (result[key] instanceof Array)
-				for (i = 0; i < result[key].length; ++i)
-					list.push(new Item(noun, result[key][i], decoration));
-			else
-				list = new Item(noun, result[key], decoration);
-
-			if ('links' in result && 'pages' in result.links && 'next' in result.links.pages)
-				next = function(callback){
-					request('get', result.links.pages.next, '', function(error, result, next){
-						if (error)
-							return callback(error);
-						return process(key, result, callback, decoration);
-					});
-				};
 
 			callback.apply(null, [null, list].concat(next ? [next] : []));
 
@@ -339,12 +340,17 @@
 			function decorateMethod(key, settings)
 			{
 				new Decorator().method(item, key, settings, function(param, callback){
-					request(settings.method || 'get', [noun, 'endpoint' in settings ? resolve(settings.endpoint, param) : ''].join('/'), param, function(error, result, next){
-						if (error)
-							return callback(error);
+					request(
+						settings.method || 'get',
+						[noun, resolve(settings.endpoint, param)].filter(function(item) { return !!item; }).join('/'),
+						param,
+						function(error, result, next){
+							if (error)
+								return callback(error);
 
-						return process(key, result, callback);
-					});
+							return process(key, result, callback);
+						}
+					);
 				});
 			}
 
@@ -407,12 +413,17 @@
 			function decorateMethod(key, settings)
 			{
 				new Decorator().method(endpoint, key, settings, function(param, callback){
-					request(settings.method || 'get', [noun, resolve(settings.endpoint, param)].join('/'), param, function(error, result, next){
-						if (error)
-							return callback(error);
+					request(
+						settings.method || 'get',
+						[resolve(noun, param), resolve(settings.endpoint, param)].filter(function(item) { return !!item; }).join('/'),
+						param,
+						function(error, result, next){
+							if (error)
+								return callback(error);
 
-						return process(noun, result, callback, itemDecoration);
-					});
+							return process(noun, result, callback, itemDecoration);
+						}
+					);
 				});
 			}
 
@@ -444,11 +455,13 @@
 		 *  @type    method
 		 *  @access  public
 		 *  @param   string token
-		 *  @return  void
+		 *  @return  object api
 		 */
 		api.token = function(value)
 		{
 			token = value;
+
+			return api;
 		};
 
 
@@ -461,6 +474,12 @@
 		api.Actions = new Endpoint('actions', {
 			id: {endpoint:'{id}', param:{id:'#'}}
 		});
+
+		/**
+		 *  Domains API implementation
+		 *   - list(function callback)
+		 */
+		api.Domains = new Endpoint('domains');
 
 		/**
 		 *  Regions API implementation
