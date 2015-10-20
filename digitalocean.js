@@ -476,6 +476,12 @@
 		});
 
 		/**
+		 *  Domains API implementation
+		 *   - list(function callback)
+		 */
+		api.Domains = new Endpoint('domains');
+
+		/**
 		 *  Regions API implementation
 		 *   - list(function callback)
 		 */
