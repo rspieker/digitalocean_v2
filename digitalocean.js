@@ -247,22 +247,23 @@
 					return false;
 
 				key = key.substr(0, key.length - 1);
+			if (result) {
+				if (result[key] instanceof Array)
+					for (i = 0; i < result[key].length; ++i)
+						list.push(new Item(noun, result[key][i], decoration));
+				else
+					list = new Item(noun, result[key], decoration);
+
+				if ('links' in result && 'pages' in result.links && 'next' in result.links.pages)
+					next = function(callback){
+						request('get', result.links.pages.next, '', function(error, result, next){
+							if (error)
+								return callback(error);
+							return process(noun, result, callback, decoration);
+						});
+					};
 			}
 
-			if (result[key] instanceof Array)
-				for (i = 0; i < result[key].length; ++i)
-					list.push(new Item(noun, result[key][i], decoration));
-			else
-				list = new Item(noun, result[key], decoration);
-
-			if ('links' in result && 'pages' in result.links && 'next' in result.links.pages)
-				next = function(callback){
-					request('get', result.links.pages.next, '', function(error, result, next){
-						if (error)
-							return callback(error);
-						return process(key, result, callback, decoration);
-					});
-				};
 
 			callback.apply(null, [null, list].concat(next ? [next] : []));
 
