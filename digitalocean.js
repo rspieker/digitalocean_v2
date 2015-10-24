@@ -301,7 +301,10 @@
 								decorateMethod(key, kx.combine({
 									endpoint: '{id}/actions',
 									param: {
-										id: item.id,
+										//  since Floating IPs don't use ids (ofcourse), use the ip instead
+										//  this should eventually be refactored in case there are more APIs
+										//  not using the `id` field
+										id: item.id || item.ip,
 										type: key.toLowerCase()
 									},
 									method: 'post'
@@ -467,6 +470,11 @@
 			return api;
 		};
 
+		/**
+		 *  Account API implementation
+		 *  - list(function callback)
+		 */
+		api.Account = new Endpoint('account');
 
 		/**
 		 *  Actions API implementation
@@ -599,6 +607,30 @@
 			create: {method:'post',param:{name:'#',public_key:'#'}},
 			update: {method:'put',endpoint:'{id}',param:{id:'#',name:'#'}},
 			destroy: {method:'delete',param:{id:'#'}}
+		});
+
+		/**
+		 *  Floating IPs API implementation
+		 *   - list(function callback)
+		 *   - id(string ip, function callback)
+		 *   - createForDroplet(number droplet_id, function callback)
+		 *   - createForRegion(string region, function callback)
+		 *   - destroy(string ip, function callback)
+		 *   Item(s) in result have the following methods:
+		 *   - assign(number dropley_id, function callback)
+		 *   - unassign(function callback)
+		 */
+		api.FloatingIPs = new Endpoint('floating_ips', {
+			id: {endpoint:'{ip}',param:{ip:'#'}},
+			createForDroplet: {method:'post',param:{droplet_id:'#'}},
+			createForRegion: {method:'post',param:{region:'#'}},
+			destroy: {endpoint:'{ip}',param:{ip:'#'}},
+			_item: {
+				_actions: {
+					assign: {param:{droplet_id:'#'}},
+					unassign: {}
+				}
+			}
 		});
 	}
 

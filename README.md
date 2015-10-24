@@ -101,7 +101,7 @@ Lists would be your basic starting point in order to find out more detailed info
 - [x] `Domains.list` - Obtain the domains in your account ([DO Reference: List all Domains](https://developers.digitalocean.com/documentation/v2/#list-all-domains))
 - [x] `Droplets.list` - Obtain the droplets in your account ([DO Reference: List all Droplets](https://developers.digitalocean.com/v2/#list-all-droplets))
 - [x] `Images.list` - Obtain the available images, both your own images as the ones provided by Digital Ocean ([DO Reference: List all Images](https://developers.digitalocean.com/v2/#list-all-images))
-- [ ] `Keys.list` - *TODO*
+- [x] `Keys.list` - Obtain the SSH keys of your account ([DO Reference: List all Keys](https://developers.digitalocean.com/v2/#list-all-keys))
 - [x] `Regions.list` - Obtain all available regions where you can create new Droplets ([DO Reference: List all Regions](https://developers.digitalocean.com/v2/#list-all-regions))
 - [x] `Sizes.list` - Obtain all available sizes for Droplets ([DO Reference: List all Sizes](https://developers.digitalocean.com/v2/#list-all-sizes))
 
@@ -122,6 +122,7 @@ DOv2.Droplets.list(function(error, result, next){
 
 
 ####API
+- [x] Account
 - [x] Actions
 	- [x] `list`
 	- [x] `id`
@@ -159,6 +160,17 @@ DOv2.Droplets.list(function(error, result, next){
 		- [x] `disableBackups` - disable backups of the droplet
 		- [x] `enablePrivateNetworking` - enable private networking for the droplet
 - [x] Images
+	- [x] `list`
+		- [ ] `?type=distribution`
+		- [ ] `?type=application`
+		- [ ] `?private=true`
+	- [x] `id`
+	- [ ] `slug`
+	- [ ] `actions`
+	- [ ] Image Actions
+		- [x] `update`
+		- [x] `transfer`
+		- [x] `destroy`
 - [x] Keys
 	- [x] `list`
 	- [x] `create`
@@ -167,3 +179,12 @@ DOv2.Droplets.list(function(error, result, next){
 	- [x] `destroy`
 - [x] Regions
 - [x] Size
+- [x] Floating IPs
+ 	- [x] `list`
+ 	- [x] `createForDroplet`
+ 	- [x] `createForRegion`
+ 	- [x] `id`
+ 	- [x] `destroy`
+	- [x] Floating IP Actions
+		- [x] `assign`
+		- [x] `unassign`
