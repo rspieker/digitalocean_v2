@@ -600,6 +600,21 @@
 			update: {method:'put',endpoint:'{id}',param:{id:'#',name:'#'}},
 			destroy: {method:'delete',param:{id:'#'}}
 		});
+
+		/**
+		 *  Floating IPs API implementation
+		 *   - list(function callback)
+		 *   - id(string ip, function callback)
+		 *   - createForDroplet(number droplet_id, function callback)
+		 *   - createForRegion(string region, function callback)
+		 *   - destroy(string ip, function callback)
+		 */
+		api.FloatingIPs = new Endpoint('floating_ips', {
+			id: {endpoint:'{ip}',param:{ip:'#'}},
+			createForDroplet: {method:'post',param:{droplet_id:'#'}},
+			createForRegion: {method:'post',param:{region:'#'}},
+			destroy: {endpoint:'{ip}',param:{ip:'#'}}
+		});
 	}
 
 	window.DOv2 = new DigitalOceanAPIv2();
