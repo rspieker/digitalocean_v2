@@ -235,18 +235,11 @@
 		 */
 		function process(noun, result, callback, decoration)
 		{
-			var key = noun,
+			var key = Object.keys(result).shift(),
 				next = null,
 				list = [],
 				i;
 
-			if (!(key in result))
-			{
-				//  API calls which return a single item by default don't use the plural form of the noun
-				if (key.charAt(key.length - 1) !== 's' || !(key.substr(0, key.length - 1) in result))
-					return false;
-
-				key = key.substr(0, key.length - 1);
 			if (result) {
 				if (result[key] instanceof Array)
 					for (i = 0; i < result[key].length; ++i)
