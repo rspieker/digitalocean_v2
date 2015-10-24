@@ -257,7 +257,6 @@
 					};
 			}
 
-
 			callback.apply(null, [null, list].concat(next ? [next] : []));
 
 			return true;
@@ -278,7 +277,6 @@
 		{
 			var item = this;
 
-
 			/**
 			 *  Initialize the Endpoint instance
 			 *  @name    init
@@ -288,7 +286,7 @@
 			 */
 			function init()
 			{
-				var key, settings;
+				var key;
 
 				for (key in data)
 					new Decorator().property(item, key, data[key]);
@@ -297,26 +295,38 @@
 				{
 					//  _actions are automatically bound to a specific Item instance, resolving the id's and
 					//  other requirements
-					if (key === '_actions')
-					{
-						for (key in decoration._actions)
+					switch (key) {
+						case '_actions':
+							for (key in decoration._actions)
+								decorateMethod(key, kx.combine({
+									endpoint: '{id}/actions',
+									param: {
+										id: item.id,
+										type: key.toLowerCase()
+									},
+									method: 'post'
+								}, decoration._actions[key]));
+							break;
+
+						case '_records':
+							for (key in decoration._records)
+								decorateMethod(key, kx.combine({
+									endpoint: ['{name}/records', decoration._records[key].endpoint].filter(function(item){ return !!item; }).join('/'),
+									param: kx.combine(
+										{name: item.name},
+										decoration._records[key].param
+									)
+								}, decoration[key]));
+							break;
+
+						default:
 							decorateMethod(key, kx.combine({
-								endpoint: '{id}/actions',
+								endpoint: '{id}/' + key,
 								param: {
-									id: item.id,
-									type: key.toLowerCase()
-								},
-								method: 'post'
-							}, decoration._actions[key]));
-					}
-					else
-					{
-						decorateMethod(key, kx.combine({
-							endpoint: '{id}/' + key,
-							param: {
-								id: item.id
-							}
-						}, decoration[key]));
+									id: item.id
+								}
+							}, decoration[key]));
+							break;
 					}
 				}
 			}
@@ -482,7 +492,13 @@
 			fetch: {endpoint:'{name}',param:{name:'#'}},
 			destroy: {method:'delete',endpoint:'{name}',param:{name:'#'}},
 			_item: {
-				destroy: {method:'delete',endpoint:'{name}',param:{name:'#'}}
+				_records: {
+					list: {},
+					id: {endpoint:'{id}',param:{id:'#'}},
+					create: {method:'post',param:{type:'#'}},
+					fetch: {endpoint:'{id}',param:{id:'#'}},
+					destroy: {method:'delete',endpoint:'{id}',param:{id:'#'}}
+				}
 			}
 		});
 
