@@ -127,10 +127,15 @@ DOv2.Droplets.list(function(error, result, next){
 	- [x] `id`
 - [x] Domains
 	- [x] `list`
-	- [ ] `fetch` *TODO*
-	- [ ] `create` *TODO*
-	- [ ] `destroy` *TODO*
-- [ ] DomainRecords *TODO*
+	- [x] `fetch`
+	- [x] `create`
+	- [x] `destroy`
+- [x] DomainRecords
+	- [x] `list`
+	- [x] `fetch`
+	- [x] `create`
+	- [ ] `update` *TODO*
+	- [x] `destroy`
 - [x] Droplets
 	- [x] `list`
 	- [x] `id`
