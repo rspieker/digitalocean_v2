@@ -159,6 +159,11 @@ DOv2.Droplets.list(function(error, result, next){
 		- [x] `disableBackups` - disable backups of the droplet
 		- [x] `enablePrivateNetworking` - enable private networking for the droplet
 - [x] Images
-- [ ] Keys *TODO*
+- [x] Keys
+	- [x] `list`
+	- [x] `create`
+	- [x] `id`
+	- [x] `update`
+	- [x] `destroy`
 - [x] Regions
 - [x] Size

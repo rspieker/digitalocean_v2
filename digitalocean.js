@@ -586,7 +586,20 @@
 			}
 		});
 
-		//TODO: implement DNS and Keys Endpoints
+		/**
+		 *  Keys API implementation
+		 *   - list(function callback)
+		 *   - id(number id, function callback)
+		 *   - create(string name, string public_key, function callback)
+		 *   - update(number id, string name, function callback)
+		 *   - destroy(number id, function callback)
+		 */
+		api.Keys = new Endpoint('account/keys', {
+			id: {endpoint:'{id}',param:{id:'#'}},
+			create: {method:'post',param:{name:'#',public_key:'#'}},
+			update: {method:'put',endpoint:'{id}',param:{id:'#',name:'#'}},
+			destroy: {method:'delete',param:{id:'#'}}
+		});
 	}
 
 	window.DOv2 = new DigitalOceanAPIv2();
