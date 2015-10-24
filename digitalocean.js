@@ -478,8 +478,20 @@
 		/**
 		 *  Domains API implementation
 		 *   - list(function callback)
+		 *   - fetch(string name, function callback)
+		 *   - create(string name, string ip, functio callback)
+		 *   - destroy(string name, function callback)
+		 *   Item(s) in result have the following methods:
+		 *   - destroy(function callback)
 		 */
-		api.Domains = new Endpoint('domains');
+		api.Domains = new Endpoint('domains', {
+			create: {method:'post',param:{name:'#',ip_address:'#'}},
+			fetch: {endpoint:'{name}',param:{name:'#'}},
+			destroy: {method:'delete',endpoint:'{name}',param:{name:'#'}},
+			_item: {
+				destroy: {method:'delete',endpoint:'{name}',param:{name:'#'}}
+			}
+		});
 
 		/**
 		 *  Regions API implementation
