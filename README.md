@@ -122,6 +122,7 @@ DOv2.Droplets.list(function(error, result, next){
 
 
 ####API
+- [x] Account
 - [x] Actions
 	- [x] `list`
 	- [x] `id`
@@ -173,4 +174,6 @@ DOv2.Droplets.list(function(error, result, next){
  	- [x] `createForRegion`
  	- [x] `id`
  	- [x] `destroy`
-- [ ] Floating IP Actions *TODO*
+- [x] Floating IP Actions
+	- [x] `assign`
+	- [x] `unassign`

@@ -470,6 +470,11 @@
 			return api;
 		};
 
+		/**
+		 *  Account API implementation
+		 *  - list(function callback)
+		 */
+		api.Account = new Endpoint('account');
 
 		/**
 		 *  Actions API implementation
