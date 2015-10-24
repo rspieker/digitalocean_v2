@@ -127,10 +127,15 @@ DOv2.Droplets.list(function(error, result, next){
 	- [x] `id`
 - [x] Domains
 	- [x] `list`
-	- [ ] `fetch` *TODO*
-	- [ ] `create` *TODO*
-	- [ ] `destroy` *TODO*
-- [ ] DomainRecords *TODO*
+	- [x] `fetch`
+	- [x] `create`
+	- [x] `destroy`
+- [x] DomainRecords
+	- [x] `list`
+	- [x] `fetch`
+	- [x] `create`
+	- [ ] `update` *TODO*
+	- [x] `destroy`
 - [x] Droplets
 	- [x] `list`
 	- [x] `id`
@@ -154,6 +159,11 @@ DOv2.Droplets.list(function(error, result, next){
 		- [x] `disableBackups` - disable backups of the droplet
 		- [x] `enablePrivateNetworking` - enable private networking for the droplet
 - [x] Images
-- [ ] Keys *TODO*
+- [x] Keys
+	- [x] `list`
+	- [x] `create`
+	- [x] `id`
+	- [x] `update`
+	- [x] `destroy`
 - [x] Regions
 - [x] Size
