@@ -160,6 +160,17 @@ DOv2.Droplets.list(function(error, result, next){
 		- [x] `disableBackups` - disable backups of the droplet
 		- [x] `enablePrivateNetworking` - enable private networking for the droplet
 - [x] Images
+	- [x] `list`
+		- [ ] `?type=distribution`
+		- [ ] `?type=application`
+		- [ ] `?private=true`
+	- [x] `id`
+	- [ ] `slug`
+	- [ ] `actions`
+	- [ ] Image Actions
+		- [x] `update`
+		- [x] `transfer`
+		- [x] `destroy`
 - [x] Keys
 	- [x] `list`
 	- [x] `create`
@@ -174,6 +185,6 @@ DOv2.Droplets.list(function(error, result, next){
  	- [x] `createForRegion`
  	- [x] `id`
  	- [x] `destroy`
-- [x] Floating IP Actions
-	- [x] `assign`
-	- [x] `unassign`
+	- [x] Floating IP Actions
+		- [x] `assign`
+		- [x] `unassign`
